@@ -10,8 +10,11 @@
 //  L-thumb: 48 49 50          R-thumb: 51 52 53 54 55
 //
 //  Thumb assignments:
-//   L48=Esc/MEDIA  L49=Spc/NAV   L50=Tab/MOUSE
-//   R51=Ent/SYM    R52=Bsp/NUM   R53=Del/FUN   R54=SCROLL  R55=SNIPE
+//   L48=Esc/MEDIA  L49=Spc/NAV   L50=Tab/MOUSE  L53=Del/FUN  L54=SCROLL
+//   R51=Del        R52=Bsp/NUM   R55=SNIPE
+//
+//  NOTE: Ent/SYM moved from R51 to R11 (top-right main grid)
+//        R51 solder joint is faulty — DEL placed there as a harmless fallback
 //
 //  Home row (GACS):
 //   A25=LGUI  S26=LALT  D27=LCTRL  F28=LSHFT
@@ -81,10 +84,11 @@
 
     combos {
         compatible = "zmk,combos";
-        // ZMK Studio unlock: hold all three right-thumb inner keys simultaneously
+        // ZMK Studio unlock: top-right key (R11/ENT) + right-thumb BSP + SNIPE
+        // (R51 excluded — bad solder joint)
         combo_studio_unlock {
             timeout-ms = <50>;
-            key-positions = <51 52 55>;
+            key-positions = <11 52 55>;
             bindings = <&studio_unlock>;
         };
     };
@@ -97,8 +101,8 @@
             label = "BASE";
             bindings = <
 // ╭──────────┬────────┬────────┬────────┬────────┬────────╮   ╭────────┬────────┬────────┬────────┬────────┬──────────╮
-//  ESC        1        2        3        4        5             6        7        8        9        0        DEL
-    &kp ESC    &kp N1   &kp N2   &kp N3   &kp N4   &kp N5       &kp N6   &kp N7   &kp N8   &kp N9   &kp N0   &kp DEL
+//  ESC        1        2        3        4        5             6        7        8        9        0        ENT/SYM
+    &kp ESC    &kp N1   &kp N2   &kp N3   &kp N4   &kp N5       &kp N6   &kp N7   &kp N8   &kp N9   &kp N0   &lt SYM RET
 // ├──────────┼────────┼────────┼────────┼────────┼────────┤   ├────────┼────────┼────────┼────────┼────────┼──────────┤
 //  TAB        Q        W        E        R        T             Y        U        I        O        P        BSPC
     &kp TAB    &kp Q    &kp W    &kp E    &kp R    &kp T        &kp Y    &kp U    &kp I    &kp O    &kp P    &kp BSPC
@@ -109,59 +113,49 @@
 //  LSHFT      Z        X        C        V        B             N        M        ,        .        /        RSHFT
     &kp LSHFT  &kp Z    &kp X    &kp C    &kp V    &kp B        &kp N    &kp M    &kp COMMA &kp DOT  &kp FSLH &kp RSHFT
 // ╰──────────┴────────┴────────┼────────┼────────┼────────╯   ╰────────┼────────┼────────┼────────┼────────┼──────────╯
-//                             ESC/MED  SPC/NAV  TAB/MSE        ENT/SYM BSP/NUM  DEL/FUN  SCROLL   SNIPE
-                               &lt MEDIA ESC  &lt NAV SPC  &lt MOUSE TAB    &lt SYM RET  &lt NUM BSPC  &lt FUN DEL  &tog SCROLL  &mo SNIPE
+//                             ESC/MED  SPC/NAV  TAB/MSE        DEL    BSP/NUM  DEL/FUN  SCROLL   SNIPE
+                               &lt MEDIA ESC  &lt NAV SPC  &lt MOUSE TAB    &kp DEL  &lt NUM BSPC  &lt FUN DEL  &tog SCROLL  &mo SNIPE
 //                             ╰────────┴────────┴────────╯   ╰────────┴────────┴────────┴────────┴──────────╯
             >;
         };
 
         // ── 1 · NAV ───────────────────────────────────────────────────────────
-        // Right hand: arrows, pg/home/end, undo/redo/cut/copy/paste
-        // Left hand: modifiers (for selection shortcuts)
         nav_layer {
             label = "NAV";
             bindings = <
-    &trans     &trans     &trans     &trans     &trans     &trans       &trans     &trans     &trans     &trans     &trans     &trans
+    &trans     &trans     &trans     &trans     &trans     &trans       &trans     &trans     &trans     &trans     &trans     &kp RET
     &trans     &trans     &trans     &trans     &trans     &trans       &kp K_REDO &kp K_PASTE &kp K_COPY &kp K_CUT  &kp K_UNDO &trans
     &trans     &kp LGUI   &kp LALT   &kp LCTRL  &kp LSHFT  &trans       &trans     &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT  &trans
     &trans     &trans     &trans     &trans     &trans     &trans       &kp INS    &kp HOME   &kp PG_DN  &kp PG_UP  &kp END    &trans
-                          &kp ESC    &trans     &kp TAB                 &kp RET    &kp BSPC   &kp DEL    &trans     &trans
+                          &kp ESC    &trans     &kp TAB                 &trans     &kp BSPC   &kp DEL    &trans     &trans
             >;
         };
 
         // ── 2 · MOUSE ─────────────────────────────────────────────────────────
-        // Physical trackball handles cursor movement; this layer gives click buttons.
-        // Right hand: mouse buttons + undo/redo/cut/copy/paste
-        // Left hand: modifiers (for modifier+click)
         mouse_layer {
             label = "MOUSE";
             bindings = <
-    &trans     &trans     &trans     &trans     &trans     &trans       &trans     &trans     &trans     &trans     &trans     &trans
+    &trans     &trans     &trans     &trans     &trans     &trans       &trans     &trans     &trans     &trans     &trans     &mkp MB2
     &trans     &trans     &trans     &trans     &trans     &trans       &kp K_REDO &kp K_PASTE &kp K_COPY &kp K_CUT  &kp K_UNDO &trans
     &trans     &kp LGUI   &kp LALT   &kp LCTRL  &kp LSHFT  &trans       &trans     &mkp MB1   &mkp MB3   &mkp MB2   &trans     &trans
     &trans     &trans     &trans     &trans     &trans     &trans       &trans     &mkp MB4   &mkp MB5   &trans     &trans     &trans
-                          &kp ESC    &kp SPC    &trans                  &mkp MB2   &mkp MB1   &mkp MB3   &trans     &trans
+                          &kp ESC    &kp SPC    &trans                  &trans     &mkp MB1   &mkp MB3   &trans     &trans
             >;
         };
 
         // ── 3 · MEDIA ─────────────────────────────────────────────────────────
-        // Right hand: media controls
-        // Left hand: modifiers
-        // Row 3 right: Bluetooth profile selection
         media_layer {
             label = "MEDIA";
             bindings = <
-    &trans     &trans     &trans     &trans     &trans     &trans       &trans        &trans          &trans          &trans          &trans          &trans
+    &trans     &trans     &trans     &trans     &trans     &trans       &trans        &trans          &trans          &trans          &trans          &kp C_STOP
     &trans     &trans     &trans     &trans     &trans     &trans       &trans        &trans          &trans          &trans          &trans          &trans
     &trans     &kp LGUI   &kp LALT   &kp LCTRL  &kp LSHFT  &trans       &trans        &kp C_PREV      &kp C_VOL_DN    &kp C_VOL_UP    &kp C_NEXT      &trans
     &trans     &trans     &trans     &trans     &trans     &trans       &trans        &bt BT_SEL 0    &bt BT_SEL 1    &bt BT_SEL 2    &bt BT_CLR      &trans
-                          &trans     &kp SPC    &kp TAB                 &kp C_STOP    &kp C_PP        &kp C_MUTE      &trans          &trans
+                          &trans     &kp SPC    &kp TAB                 &trans        &kp C_PP        &kp C_MUTE      &trans          &trans
             >;
         };
 
         // ── 4 · NUM ───────────────────────────────────────────────────────────
-        // Left hand: numpad (7-8-9 / 4-5-6 / 1-2-3 on ring/middle/index)
-        // Right hand: modifiers (mirror of left HRM)
         num_layer {
             label = "NUM";
             bindings = <
@@ -174,8 +168,6 @@
         };
 
         // ── 5 · SCROLL ────────────────────────────────────────────────────────
-        // All-transparent: trackball reports scroll when this layer is active.
-        // R54 toggles scroll off again.
         scroll_layer {
             label = "SCROLL";
             bindings = <
@@ -188,8 +180,6 @@
         };
 
         // ── 6 · SNIPE ─────────────────────────────────────────────────────────
-        // All-transparent: trackball runs at low DPI (precision/snipe mode).
-        // Hold R55 to enter; release to exit.
         snipe_layer {
             label = "SNIPE";
             bindings = <
@@ -202,8 +192,6 @@
         };
 
         // ── 7 · SYM ───────────────────────────────────────────────────────────
-        // Left hand: symbols (Miryoku canonical symbol layer)
-        // Right hand: modifiers (mirror of left HRM)
         sym_layer {
             label = "SYM";
             bindings = <
@@ -216,8 +204,6 @@
         };
 
         // ── 8 · FUN ───────────────────────────────────────────────────────────
-        // Left hand: function keys (F7-F12 / F4-F6 / F1-F3)
-        // Right hand: modifiers (mirror of left HRM)
         fun_layer {
             label = "FUN";
             bindings = <
